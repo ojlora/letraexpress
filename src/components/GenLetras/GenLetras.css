@@ -1,0 +1,19 @@
+.letras-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.letra-item {
+    background-color: #f8f9fa;
+}
+
+.is-invalid {
+    border-color: red;
+}
+
+@media (min-width: 768px) {
+    .letra-item {
+        display: none;
+    }
+}
