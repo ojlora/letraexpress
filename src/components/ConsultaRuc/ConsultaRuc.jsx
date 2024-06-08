@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { fetchRucData } from '../../services/api';
 import './ConsultaRuc.css';
 
-const ConsultaRuc = () => {
+const ConsultaRuc = ({ onRucDataUpdate }) => {
     const [ruc, setRuc] = useState('');
     const [data, setData] = useState({
         razon_social: '',
@@ -27,7 +27,7 @@ const ConsultaRuc = () => {
     };
 
     const handleSuccess = (respuesta) => {
-        setData({
+        const updatedData = {
             razon_social: respuesta.razon_social,
             direccion: respuesta.direccion,
             ubigeo: respuesta.ubigeo,
@@ -36,9 +36,11 @@ const ConsultaRuc = () => {
             departamento: respuesta.departamento,
             provincia: respuesta.provincia,
             distrito: respuesta.distrito
-        });
+        };
+        setData(updatedData);
         setStatus(respuesta.estado === 'ACTIVO' ? 'text-success' : 'text-danger');
         setError('');
+        onRucDataUpdate(updatedData);
     };
 
     const handleError = (message) => {

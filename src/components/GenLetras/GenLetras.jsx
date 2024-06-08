@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { generarPDF } from '../../services/pdfService';
 import './GenLetras.css';
 
-const GenLetras = () => {
+const GenLetras = ({ rucData }) => {
     const [numLetras, setNumLetras] = useState('');
     const [letras, setLetras] = useState([]);
     const [errores, setErrores] = useState([]);
@@ -47,7 +47,7 @@ const GenLetras = () => {
         );
 
         if (!hayErrores) {
-            generarPDF(letras);
+            generarPDF(letras, rucData);
         }
     };
 
