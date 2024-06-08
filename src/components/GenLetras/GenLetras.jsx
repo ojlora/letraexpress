@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { generarPDF } from '../../services/pdfService';
 import './GenLetras.css';
 
 const GenLetras = () => {
-    const [numLetras, setNumLetras] = useState(''); // Inicializar como cadena vacía
+    const [numLetras, setNumLetras] = useState('');
     const [letras, setLetras] = useState([]);
-    const [errores, setErrores] = useState([]); // Estado para errores
+    const [errores, setErrores] = useState([]);
 
     const handleNumLetrasChange = (e) => {
         setNumLetras(e.target.value);
@@ -21,7 +22,7 @@ const GenLetras = () => {
             importe: ''
         }));
         setLetras(newLetras);
-        setErrores([]); // Reiniciar errores
+        setErrores([]);
     };
 
     const handleInputChange = (index, field, value) => {
@@ -46,8 +47,7 @@ const GenLetras = () => {
         );
 
         if (!hayErrores) {
-            console.log('Imprimir letras:', letras);
-            // Aquí puedes implementar la lógica para imprimir las letras
+            generarPDF(letras);
         }
     };
 
@@ -87,7 +87,7 @@ const GenLetras = () => {
                                                 type="text"
                                                 value={letra.letra}
                                                 onChange={(e) => handleInputChange(index, 'letra', e.target.value)}
-                                                className="form-control"
+                                                className={`form-control ${errores[index] && errores[index].letra ? 'is-invalid' : ''}`}
                                             />
                                         </td>
                                         <td>
@@ -95,7 +95,7 @@ const GenLetras = () => {
                                                 type="text"
                                                 value={letra.referencia}
                                                 onChange={(e) => handleInputChange(index, 'referencia', e.target.value)}
-                                                className="form-control"
+                                                className={`form-control ${errores[index] && errores[index].referencia ? 'is-invalid' : ''}`}
                                             />
                                         </td>
                                         <td>
@@ -103,7 +103,7 @@ const GenLetras = () => {
                                                 type="date"
                                                 value={letra.giro}
                                                 onChange={(e) => handleInputChange(index, 'giro', e.target.value)}
-                                                className="form-control"
+                                                className={`form-control ${errores[index] && errores[index].giro ? 'is-invalid' : ''}`}
                                             />
                                         </td>
                                         <td>
@@ -111,7 +111,7 @@ const GenLetras = () => {
                                                 type="date"
                                                 value={letra.vencimiento}
                                                 onChange={(e) => handleInputChange(index, 'vencimiento', e.target.value)}
-                                                className="form-control"
+                                                className={`form-control ${errores[index] && errores[index].vencimiento ? 'is-invalid' : ''}`}
                                             />
                                         </td>
                                         <td>
@@ -129,7 +129,7 @@ const GenLetras = () => {
                                                 type="text"
                                                 value={`${letra.moneda === 'Soles' ? 'S/' : 'US$'} ${letra.importe}`}
                                                 onChange={(e) => handleInputChange(index, 'importe', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                className="form-control"
+                                                className={`form-control ${errores[index] && errores[index].importe ? 'is-invalid' : ''}`}
                                             />
                                         </td>
                                     </tr>
