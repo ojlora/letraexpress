@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import ConsultaRuc from './ConsultaRuc/ConsultaRuc';
 import GenLetras from './GenLetras/GenLetras';
-import '../styles/App.css';
+import Footer from './Footer/Footer'; // Importa el componente Footer
+import '../styles/App.css'; // Asegúrate de que el archivo CSS global esté importado
 
 const App = () => {
     const [rucData, setRucData] = useState({
@@ -9,21 +10,18 @@ const App = () => {
         razon_social: '',
         direccion: '',
         ubigeo: '',
-        estado: '',
+        telefono: '',
         condicion: '',
         departamento: '',
         provincia: '',
         distrito: ''
     });
 
-    const handleRucDataUpdate = (data) => {
-        setRucData(data);
-    };
-
     return (
         <div className="App">
-            <ConsultaRuc onRucDataUpdate={handleRucDataUpdate} />
+            <ConsultaRuc setRucData={setRucData} />
             <GenLetras rucData={rucData} />
+            <Footer /> {/* Añade el componente Footer */}
         </div>
     );
 };

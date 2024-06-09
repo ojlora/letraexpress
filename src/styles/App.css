@@ -1,3 +1,8 @@
+/* Asegurarse de que todos los textos en inputs estén en mayúsculas */
+input {
+  text-transform: uppercase;
+}
+
 .App {
   text-align: center;
 }

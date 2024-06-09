@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { generarPDF } from '../../services/pdfService';
+import { generarPDFs } from '../../services/pdfService';
 import './GenLetras.css';
 
 const GenLetras = ({ rucData }) => {
     const [numLetras, setNumLetras] = useState('');
     const [letras, setLetras] = useState([]);
     const [errores, setErrores] = useState([]);
+    const [mensajeError, setMensajeError] = useState('');
 
     const handleNumLetrasChange = (e) => {
         setNumLetras(e.target.value);
@@ -31,7 +32,7 @@ const GenLetras = ({ rucData }) => {
         setLetras(newLetras);
     };
 
-    const handlePrint = () => {
+    const validarCampos = () => {
         const nuevosErrores = letras.map(letra => ({
             letra: letra.letra === '',
             referencia: letra.referencia === '',
@@ -40,14 +41,30 @@ const GenLetras = ({ rucData }) => {
             importe: letra.importe === ''
         }));
 
-        setErrores(nuevosErrores);
-
         const hayErrores = nuevosErrores.some(error => 
             error.letra || error.referencia || error.giro || error.vencimiento || error.importe
         );
 
-        if (!hayErrores) {
-            generarPDF(letras, rucData);
+        setErrores(nuevosErrores);
+
+        if (hayErrores) {
+            setMensajeError('Por favor, completa todos los campos antes de imprimir.');
+            return false;
+        }
+
+        const camposRucVacios = !rucData.ruc || !rucData.razon_social || !rucData.direccion || !rucData.distrito || !rucData.provincia || !rucData.departamento || !rucData.telefono;
+        if (camposRucVacios) {
+            setMensajeError('Por favor, completa todos los campos del Cliente antes de imprimir.');
+            return false;
+        }
+
+        setMensajeError('');
+        return true;
+    };
+
+    const handlePrint = () => {
+        if (validarCampos()) {
+            generarPDFs(letras, rucData);
         }
     };
 
@@ -64,6 +81,7 @@ const GenLetras = ({ rucData }) => {
                 />
                 <button onClick={handleGenerate} className="btn btn-primary">Generar</button>
             </div>
+            {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
             {letras.length > 0 && (
                 <>
                     {/* Tabla para dispositivos grandes */}
@@ -127,7 +145,7 @@ const GenLetras = ({ rucData }) => {
                                         <td>
                                             <input
                                                 type="text"
-                                                value={`${letra.moneda === 'Soles' ? 'S/' : 'US$'} ${letra.importe}`}
+                                                value={letra.importe}
                                                 onChange={(e) => handleInputChange(index, 'importe', e.target.value.replace(/[^0-9.]/g, ''))}
                                                 className={`form-control ${errores[index] && errores[index].importe ? 'is-invalid' : ''}`}
                                             />
@@ -223,7 +241,7 @@ const GenLetras = ({ rucData }) => {
                                         <input
                                             type="text"
                                             id={`importe-${index}`}
-                                            value={`${letra.moneda === 'Soles' ? 'S/' : 'US$'} ${letra.importe}`}
+                                            value={letra.importe}
                                             onChange={(e) => handleInputChange(index, 'importe', e.target.value.replace(/[^0-9.]/g, ''))}
                                             className={`form-control ${errores[index] && errores[index].importe ? 'is-invalid' : ''}`}
                                         />

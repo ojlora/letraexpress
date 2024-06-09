@@ -1,0 +1,9 @@
+.footer {
+    text-align: center;
+    color: black;
+    padding: 10px 0;
+    background-color: #f8f8f8; /* Puedes ajustar el color de fondo si es necesario */
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}

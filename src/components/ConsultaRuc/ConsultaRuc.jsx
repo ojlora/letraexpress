@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { fetchRucData } from '../../services/api';
 import './ConsultaRuc.css';
 
-const ConsultaRuc = ({ onRucDataUpdate }) => {
+const ConsultaRuc = ({ setRucData }) => {
     const [ruc, setRuc] = useState('');
     const [data, setData] = useState({
         razon_social: '',
         direccion: '',
         ubigeo: '',
-        estado: '',
+        telefono: '',
         condicion: '',
         departamento: '',
         provincia: '',
@@ -21,6 +21,14 @@ const ConsultaRuc = ({ onRucDataUpdate }) => {
         setRuc(e.target.value);
     };
 
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setData(prevData => ({
+            ...prevData,
+            [id]: value
+        }));
+    };
+
     const handleRucBlur = () => {
         let token = '47c41ee6abf123efed099d536963a80d'; // Reemplaza esto con tu token
         fetchRucData(ruc, token, handleSuccess, handleError);
@@ -28,24 +36,29 @@ const ConsultaRuc = ({ onRucDataUpdate }) => {
 
     const handleSuccess = (respuesta) => {
         const updatedData = {
+            ruc,
             razon_social: respuesta.razon_social,
             direccion: respuesta.direccion,
             ubigeo: respuesta.ubigeo,
-            estado: respuesta.estado,
+            telefono: '',
             condicion: respuesta.condicion,
             departamento: respuesta.departamento,
             provincia: respuesta.provincia,
             distrito: respuesta.distrito
         };
         setData(updatedData);
+        setRucData(updatedData);
         setStatus(respuesta.estado === 'ACTIVO' ? 'text-success' : 'text-danger');
         setError('');
-        onRucDataUpdate(updatedData);
     };
 
     const handleError = (message) => {
         setError(message);
     };
+
+    useEffect(() => {
+        setRucData(data);
+    }, [data, setRucData]);
 
     return (
         <div className="consulta-ruc container mt-4">
@@ -66,14 +79,15 @@ const ConsultaRuc = ({ onRucDataUpdate }) => {
                 <div className={`resultadoCliente ${status}`}>
                     {data.estado}
                 </div>
-                <input type="text" id="razon_social" placeholder="Razón Social" value={data.razon_social} readOnly className="form-control mb-3" />
-                <input type="text" id="direccion" placeholder="Dirección" value={data.direccion} readOnly className="form-control mb-3" />
-                <input type="text" id="ubigeo" placeholder="Ubigeo" value={data.ubigeo} readOnly className="form-control mb-3" />
-                <input type="text" id="estado" placeholder="Estado" value={data.estado} readOnly className="form-control mb-3" />
-                <input type="text" id="condicion" placeholder="Condición" value={data.condicion} readOnly className="form-control mb-3" />
-                <input type="text" id="depar" placeholder="Departamento" value={data.departamento} readOnly className="form-control mb-3" />
-                <input type="text" id="provincia" placeholder="Provincia" value={data.provincia} readOnly className="form-control mb-3" />
-                <input type="text" id="distrito" placeholder="Distrito" value={data.distrito} readOnly className="form-control mb-3" />
+                <input type="hidden" id="ruc_data" value={ruc} />
+                <input type="text" id="razon_social" placeholder="Razón Social" value={data.razon_social} onChange={handleInputChange} className="form-control mb-3" />
+                <input type="text" id="direccion" placeholder="Dirección" value={data.direccion} onChange={handleInputChange} className="form-control mb-3" />
+                <input type="text" id="ubigeo" placeholder="Ubigeo" value={data.ubigeo} onChange={handleInputChange} className="form-control mb-3" />
+                <input type="text" id="telefono" placeholder="Teléfono" value={data.telefono} onChange={handleInputChange} className="form-control mb-3" />
+                <input type="text" id="condicion" placeholder="Condición" value={data.condicion} onChange={handleInputChange} className="form-control mb-3" />
+                <input type="text" id="depar" placeholder="Departamento" value={data.departamento} onChange={handleInputChange} className="form-control mb-3" />
+                <input type="text" id="provincia" placeholder="Provincia" value={data.provincia} onChange={handleInputChange} className="form-control mb-3" />
+                <input type="text" id="distrito" placeholder="Distrito" value={data.distrito} onChange={handleInputChange} className="form-control mb-3" />
             </div>
         </div>
     );
