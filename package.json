@@ -2,7 +2,10 @@
   "name": "letraexpress",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/letraexpress",
   "dependencies": {
+    "@svgr/plugin-svgo": "^8.1.0",
+    "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -13,7 +16,9 @@
     "moment": "^2.30.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
+    "resolve-url-loader": "^5.0.0",
+    "svgo": "^3.3.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -40,5 +45,8 @@
       "last 1 safari version"
     ],
     "proxy": "http://localhost:5000"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-private-methods": "^7.24.7"
   }
 }

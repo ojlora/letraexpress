@@ -250,10 +250,8 @@ const GenLetras = ({ rucData }) => {
                             </div>
                         ))}
                     </div>
+                    <button onClick={handlePrint} className="btn btn-success mt-3">Imprimir Letras</button>
                 </>
-            )}
-            {letras.length > 0 && (
-                <button onClick={handlePrint} className="btn btn-success mt-3">Imprimir Letras</button>
             )}
         </div>
     );
