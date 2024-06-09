@@ -14,6 +14,6 @@ export const numeroALetras = (num, moneda) => {
     const entero = Math.floor(num);
     const decimal = Math.round((num - entero) * 100);
 
-    const letras = `${convert(entero)} ${decimal}/100 ${moneda}`.toUpperCase();
+    const letras = `${convert(entero)} y ${decimal}/100 ${moneda}`.toUpperCase();
     return letras;
 };
