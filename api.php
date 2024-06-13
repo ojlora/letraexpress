@@ -31,6 +31,12 @@ curl_setopt_array($curl, array(
 
 $response = curl_exec($curl);
 
+if (curl_errno($curl)) {
+    echo json_encode('error');
+    curl_close($curl);
+    exit;
+}
+
 curl_close($curl);
 
 $empresa = json_decode($response);
