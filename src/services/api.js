@@ -3,7 +3,7 @@ import $ from 'jquery';
 export function fetchRucData(ruc, token, onSuccess, onError) {
     $.ajax({
         method: "GET",
-        url: `http://localhost/letraexpress/api.php?ruc=${ruc}&token=${token}`,
+        url: `http://letraexpress.crearte.com.pe/api.php?ruc=${ruc}&token=${token}`,
         dataType: "json",
         success: function (respuesta) {
             if (respuesta !== 'error') {
