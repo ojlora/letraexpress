@@ -1,0 +1,21 @@
+.estado {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.estado-circulo {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.estado-circulo.activo {
+    background-color: green;
+}
+
+.estado-circulo.inactivo {
+    background-color: red;
+}

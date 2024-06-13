@@ -17,10 +17,15 @@ const formatearImporte = (importe, moneda) => {
 };
 
 export const generarPDFs = (letras, rucData) => {
-    letras.forEach((letra) => {
-        const doc = new jsPDF('landscape', 'pt', 'a4');
+    const doc = new jsPDF('landscape', 'pt', 'a4');
+    let totalImporte = 0;
 
-        // Agregar la imagen de fondo de la primera hoja
+    letras.forEach((letra, index) => {
+        if (index > 0) {
+            doc.addPage();
+        }
+
+        // Agregar la imagen de fondo de la hoja correspondiente
         doc.addImage(templateImage, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
 
         // Configurar el tamaño de fuente
@@ -43,19 +48,44 @@ export const generarPDFs = (letras, rucData) => {
         doc.text(formatearImporte(letra.importe, letra.moneda).toUpperCase(), 650, 230); // Importe con moneda
 
         // Agregar importe en texto
-        doc.text(numeroALetras(letra.importe, letra.moneda === 'Soles' ? 'SOLES' : 'DÓLARES'), 240, 268); // Ajusta según la plantilla
+        doc.text(numeroALetras(letra.importe, letra.moneda === 'Soles' ? 'SOLES' : 'DÓLARES').toUpperCase(), 240, 268); // Ajusta según la plantilla
 
         // Agregar texto "LIMA"
         doc.text('LIMA', 483, 230); // Ajusta las coordenadas según sea necesario
 
-        // Agregar una nueva página
-        doc.addPage();
-
-        // Agregar la imagen de fondo de la segunda hoja
-        doc.addImage(templateImageBack, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
-
-        // Guardar el PDF con el nombre de la razón social, RUC y el valor de la letra
-        const fileName = `${(rucData.razon_social || 'Documento').toUpperCase()}-${(rucData.ruc || '').toUpperCase()}-${(letra.letra || '').toUpperCase()}.pdf`;
-        doc.save(fileName);
+        // Sumar el importe total
+        totalImporte += parseFloat(letra.importe);
     });
+
+    // Agregar una nueva página para el resumen
+    doc.addPage();
+    
+    // Configurar el tamaño de fuente
+    doc.setFontSize(12);
+    doc.text('RESUMEN DE LETRAS EMITIDAS', 40, 40);
+
+    // Configurar la tabla
+    const resumenData = letras.map((letra, index) => [
+        (letra.letra || '').toUpperCase(),
+        (rucData.razon_social || '').toUpperCase(),
+        (rucData.ruc || '').toUpperCase(),
+        formatearFecha(letra.giro).toUpperCase(),
+        formatearFecha(letra.vencimiento).toUpperCase(),
+        formatearImporte(letra.importe, letra.moneda).toUpperCase()
+    ]);
+
+    doc.autoTable({
+        head: [['LETRA', 'RAZÓN SOCIAL', 'RUC', 'EMISION', 'VENCIMIENTO', 'IMPORTE']],
+        body: resumenData,
+        startY: 60,
+        theme: 'grid'
+    });
+
+    // Agregar el importe total al final de la tabla
+    doc.setFontSize(10);
+    doc.text(`TOTAL: ${formatearImporte(totalImporte.toString(), letras[0].moneda).toUpperCase()}`, 40, doc.autoTable.previous.finalY + 20);
+
+    // Guardar el PDF con el nombre de la razón social y RUC
+    const fileName = `${(rucData.razon_social || 'Documento').toUpperCase()} ${(rucData.ruc || '').toUpperCase()}.pdf`;
+    doc.save(fileName);
 };

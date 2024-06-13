@@ -12,10 +12,11 @@ const ConsultaRuc = ({ setRucData }) => {
         condicion: '',
         departamento: '',
         provincia: '',
-        distrito: ''
+        distrito: '',
+        estado: '' // Agregar estado aquí
     });
-    const [status, setStatus] = useState('');
     const [error, setError] = useState('');
+    const [consultaRealizada, setConsultaRealizada] = useState(false); // Estado para verificar si se realizó la consulta
 
     const handleRucChange = (e) => {
         setRuc(e.target.value);
@@ -44,16 +45,18 @@ const ConsultaRuc = ({ setRucData }) => {
             condicion: respuesta.condicion,
             departamento: respuesta.departamento,
             provincia: respuesta.provincia,
-            distrito: respuesta.distrito
+            distrito: respuesta.distrito,
+            estado: respuesta.estado // Agregar estado aquí
         };
         setData(updatedData);
         setRucData(updatedData);
-        setStatus(respuesta.estado === 'ACTIVO' ? 'text-success' : 'text-danger');
         setError('');
+        setConsultaRealizada(true); // Marcar que la consulta se ha realizado
     };
 
     const handleError = (message) => {
         setError(message);
+        setConsultaRealizada(false); // Marcar que la consulta no se ha realizado
     };
 
     useEffect(() => {
@@ -76,9 +79,12 @@ const ConsultaRuc = ({ setRucData }) => {
             </div>
             {error && <div className="alert alert-danger">{error}</div>}
             <div className="resultados">
-                <div className={`resultadoCliente ${status}`}>
-                    {data.estado}
-                </div>
+                {consultaRealizada && (
+                    <div className="estado">
+                        <span className={`estado-circulo ${data.estado === 'ACTIVO' ? 'activo' : 'inactivo'}`}></span>
+                        {data.estado === 'ACTIVO' && <span>Activo</span>}
+                    </div>
+                )}
                 <input type="hidden" id="ruc_data" value={ruc} />
                 <input type="text" id="razon_social" placeholder="Razón Social" value={data.razon_social} onChange={handleInputChange} className="form-control mb-3" />
                 <input type="text" id="direccion" placeholder="Dirección" value={data.direccion} onChange={handleInputChange} className="form-control mb-3" />
