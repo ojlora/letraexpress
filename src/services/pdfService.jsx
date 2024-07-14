@@ -1,7 +1,6 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import templateImage from '../assets/template_letra_mm.png';
-import templateImageBack from '../assets/template_letra_mm_back.png';
 import { numeroALetras } from './numberToWords';
 
 // Función para formatear la fecha en DD/MM/AAAA
@@ -17,7 +16,7 @@ const formatearImporte = (importe, moneda) => {
 };
 
 export const generarPDFs = (letras, rucData) => {
-    const doc = new jsPDF('landscape', 'pt', 'a4');
+    const doc = new jsPDF('landscape', 'pt', 'a4', true);
     let totalImporte = 0;
 
     letras.forEach((letra, index) => {

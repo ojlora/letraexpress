@@ -91,7 +91,7 @@ const ConsultaRuc = ({ setRucData }) => {
                 <input type="text" id="ubigeo" placeholder="Ubigeo" value={data.ubigeo} onChange={handleInputChange} className="form-control mb-3" />
                 <input type="text" id="telefono" placeholder="Teléfono" value={data.telefono} onChange={handleInputChange} className="form-control mb-3" />
                 <input type="text" id="condicion" placeholder="Condición" value={data.condicion} onChange={handleInputChange} className="form-control mb-3" />
-                <input type="text" id="depar" placeholder="Departamento" value={data.departamento} onChange={handleInputChange} className="form-control mb-3" />
+                <input type="text" id="departamento" placeholder="Departamento" value={data.departamento} onChange={handleInputChange} className="form-control mb-3" />
                 <input type="text" id="provincia" placeholder="Provincia" value={data.provincia} onChange={handleInputChange} className="form-control mb-3" />
                 <input type="text" id="distrito" placeholder="Distrito" value={data.distrito} onChange={handleInputChange} className="form-control mb-3" />
             </div>
