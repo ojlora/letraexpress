@@ -15,6 +15,17 @@ const formatearImporte = (importe, moneda) => {
     return `${moneda === 'Soles' ? 'S/' : 'US$'} ${formattedImporte}`;
 };
 
+// Función para ajustar el tamaño de fuente según el espacio disponible
+const ajustarTamañoFuente = (doc, texto, maxAncho, tamañoFuenteInicial) => {
+    let tamañoFuente = tamañoFuenteInicial;
+    doc.setFontSize(tamañoFuente);
+    while (doc.getTextWidth(texto) > maxAncho && tamañoFuente > 0) {
+        tamañoFuente -= 0.5;
+        doc.setFontSize(tamañoFuente);
+    }
+    return tamañoFuente;
+};
+
 export const generarPDFs = (letras, rucData) => {
     const doc = new jsPDF('landscape', 'pt', 'a4', true);
     let totalImporte = 0;
@@ -30,13 +41,33 @@ export const generarPDFs = (letras, rucData) => {
         // Configurar el tamaño de fuente
         doc.setFontSize(9);
 
-        // Agregar datos del RUC al PDF en las coordenadas específicas de la primera hoja
+        // Ajustar tamaño de fuente para el campo razon_social
+        const razonSocial = (rucData.razon_social || '').toUpperCase();
+        const tamañoFuenteRazonSocial = ajustarTamañoFuente(doc, razonSocial, 200, 9); // Espacio desde 250 a 450 es 200
+        doc.setFontSize(tamañoFuenteRazonSocial);
+        doc.text(razonSocial, 250, 298);
+
+        // Ajustar tamaño de fuente para el campo direccion
+        const direccion = (rucData.direccion || '').toUpperCase();
+        const tamañoFuenteDireccion = ajustarTamañoFuente(doc, direccion, 200, 9); // Espacio desde 250 a 450 es 200
+        doc.setFontSize(tamañoFuenteDireccion);
+        doc.text(direccion, 248, 315);
+
+        // Ajustar tamaño de fuente para el campo distrito
+        const distrito = (rucData.distrito || '').toUpperCase();
+        const tamañoFuenteDistrito = ajustarTamañoFuente(doc, distrito, 118, 9); // Espacio desde 230 a 350 es 120
+        doc.setFontSize(tamañoFuenteDistrito);
+        doc.text(distrito, 220, 330);
+
+        // Ajustar tamaño de fuente para el campo departamento
+        const departamento = (rucData.departamento || '').toUpperCase();
+        const tamañoFuenteDepartamento = ajustarTamañoFuente(doc, departamento, 100, 9); // Espacio de 100
+        doc.setFontSize(tamañoFuenteDepartamento);
+        doc.text(departamento, 368, 330);
+
+        // Restaurar tamaño de fuente para otros campos
+        doc.setFontSize(9);
         doc.text(`${(rucData.ruc || '').toUpperCase()}`, 250, 348); // Coordenadas x, y ajustadas
-        doc.text(`${(rucData.razon_social || '').toUpperCase()}`, 250, 298); // Ajusta según la plantilla
-        doc.text(`${(rucData.direccion || '').toUpperCase()}`, 250, 315);
-        doc.text(`${(rucData.distrito || '').toUpperCase()}`, 230, 330);
-        doc.text(`${(rucData.provincia || '').toUpperCase()}`, 280, 330);
-        doc.text(`${(rucData.departamento || '').toUpperCase()}`, 365, 330);
         doc.text(`${(rucData.telefono || '').toUpperCase()}`, 365, 348); // Coordenadas para el teléfono
 
         // Agregar datos de la letra en la primera hoja
