@@ -32,6 +32,10 @@ const GenLetras = ({ rucData }) => {
         setLetras(newLetras);
     };
 
+    const getPlaceholder = (moneda) => {
+        return moneda === 'Soles' ? 'S/. 0.00' : 'US$ 0.00';
+    };
+
     const validarCampos = () => {
         const nuevosErrores = letras.map(letra => ({
             letra: letra.letra === '',
@@ -145,6 +149,7 @@ const GenLetras = ({ rucData }) => {
                                         <td>
                                             <input
                                                 type="text"
+                                                placeholder={getPlaceholder(letra.moneda)}
                                                 value={letra.importe}
                                                 onChange={(e) => handleInputChange(index, 'importe', e.target.value.replace(/[^0-9.]/g, ''))}
                                                 className={`form-control ${errores[index] && errores[index].importe ? 'is-invalid' : ''}`}
@@ -241,6 +246,7 @@ const GenLetras = ({ rucData }) => {
                                         <input
                                             type="text"
                                             id={`importe-${index}`}
+                                            placeholder={getPlaceholder(letra.moneda)}
                                             value={letra.importe}
                                             onChange={(e) => handleInputChange(index, 'importe', e.target.value.replace(/[^0-9.]/g, ''))}
                                             className={`form-control ${errores[index] && errores[index].importe ? 'is-invalid' : ''}`}

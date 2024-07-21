@@ -12,6 +12,13 @@
     border-color: red;
 }
 
+
+.form-control::placeholder {
+    color: gray;
+    opacity: 1; /* Para que el color se aplique correctamente en todos los navegadores */
+}
+
+
 @media (min-width: 768px) {
     .letra-item {
         display: none;
