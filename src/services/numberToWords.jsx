@@ -16,11 +16,11 @@ const convert = (n) => {
         const resto = n % 1000;
         let milesTexto = convert(miles);
         if (miles === 1) {
-            milesTexto = '';
-        } else if (milesTexto === 'uno') {
             milesTexto = 'un';
         } else if (miles === 21) {
-            milesTexto = 'veintiun';
+            milesTexto = 'veintiún';
+        } else if (milesTexto === 'uno') {
+            milesTexto = 'un';
         }
         return milesTexto + ' mil ' + (resto ? convert(resto) : '');
     }
