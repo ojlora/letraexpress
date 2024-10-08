@@ -5,8 +5,6 @@ import './GenLetras.css';
 const GenLetras = ({ rucData }) => {
     const [numLetras, setNumLetras] = useState('');
     const [letras, setLetras] = useState([]);
-    const [errores, setErrores] = useState([]);
-    const [mensajeError, setMensajeError] = useState('');
 
     const handleNumLetrasChange = (e) => {
         setNumLetras(e.target.value);
@@ -23,7 +21,6 @@ const GenLetras = ({ rucData }) => {
             importe: ''
         }));
         setLetras(newLetras);
-        setErrores([]);
     };
 
     const handleInputChange = (index, field, value) => {
@@ -36,40 +33,9 @@ const GenLetras = ({ rucData }) => {
         return moneda === 'Soles' ? 'S/. 0.00' : 'US$ 0.00';
     };
 
-    const validarCampos = () => {
-        const nuevosErrores = letras.map(letra => ({
-            letra: letra.letra === '',
-            referencia: letra.referencia === '',
-            giro: letra.giro === '',
-            vencimiento: letra.vencimiento === '',
-            importe: letra.importe === ''
-        }));
-
-        const hayErrores = nuevosErrores.some(error => 
-            error.letra || error.referencia || error.giro || error.vencimiento || error.importe
-        );
-
-        setErrores(nuevosErrores);
-
-        if (hayErrores) {
-            setMensajeError('Por favor, completa todos los campos antes de imprimir.');
-            return false;
-        }
-
-        const camposRucVacios = !rucData.ruc || !rucData.razon_social || !rucData.direccion || !rucData.distrito || !rucData.provincia || !rucData.departamento || !rucData.telefono;
-        if (camposRucVacios) {
-            setMensajeError('Por favor, completa todos los campos del Cliente antes de imprimir.');
-            return false;
-        }
-
-        setMensajeError('');
-        return true;
-    };
-
     const handlePrint = () => {
-        if (validarCampos()) {
-            generarPDFs(letras, rucData);
-        }
+        // No hay validación, simplemente se llama a la función de generación de PDFs
+        generarPDFs(letras, rucData);
     };
 
     return (
@@ -85,7 +51,7 @@ const GenLetras = ({ rucData }) => {
                 />
                 <button onClick={handleGenerate} className="btn btn-primary">Generar</button>
             </div>
-            {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
+
             {letras.length > 0 && (
                 <>
                     {/* Tabla para dispositivos grandes */}
@@ -109,7 +75,7 @@ const GenLetras = ({ rucData }) => {
                                                 type="text"
                                                 value={letra.letra}
                                                 onChange={(e) => handleInputChange(index, 'letra', e.target.value)}
-                                                className={`form-control ${errores[index] && errores[index].letra ? 'is-invalid' : ''}`}
+                                                className="form-control"
                                             />
                                         </td>
                                         <td>
@@ -117,7 +83,7 @@ const GenLetras = ({ rucData }) => {
                                                 type="text"
                                                 value={letra.referencia}
                                                 onChange={(e) => handleInputChange(index, 'referencia', e.target.value)}
-                                                className={`form-control ${errores[index] && errores[index].referencia ? 'is-invalid' : ''}`}
+                                                className="form-control"
                                             />
                                         </td>
                                         <td>
@@ -125,7 +91,7 @@ const GenLetras = ({ rucData }) => {
                                                 type="date"
                                                 value={letra.giro}
                                                 onChange={(e) => handleInputChange(index, 'giro', e.target.value)}
-                                                className={`form-control ${errores[index] && errores[index].giro ? 'is-invalid' : ''}`}
+                                                className="form-control"
                                             />
                                         </td>
                                         <td>
@@ -133,7 +99,7 @@ const GenLetras = ({ rucData }) => {
                                                 type="date"
                                                 value={letra.vencimiento}
                                                 onChange={(e) => handleInputChange(index, 'vencimiento', e.target.value)}
-                                                className={`form-control ${errores[index] && errores[index].vencimiento ? 'is-invalid' : ''}`}
+                                                className="form-control"
                                             />
                                         </td>
                                         <td>
@@ -152,7 +118,7 @@ const GenLetras = ({ rucData }) => {
                                                 placeholder={getPlaceholder(letra.moneda)}
                                                 value={letra.importe}
                                                 onChange={(e) => handleInputChange(index, 'importe', e.target.value.replace(/[^0-9.]/g, ''))}
-                                                className={`form-control ${errores[index] && errores[index].importe ? 'is-invalid' : ''}`}
+                                                className="form-control"
                                             />
                                         </td>
                                     </tr>
@@ -176,7 +142,7 @@ const GenLetras = ({ rucData }) => {
                                             id={`letra-${index}`}
                                             value={letra.letra}
                                             onChange={(e) => handleInputChange(index, 'letra', e.target.value)}
-                                            className={`form-control ${errores[index] && errores[index].letra ? 'is-invalid' : ''}`}
+                                            className="form-control"
                                         />
                                     </div>
                                 </div>
@@ -190,7 +156,7 @@ const GenLetras = ({ rucData }) => {
                                             id={`referencia-${index}`}
                                             value={letra.referencia}
                                             onChange={(e) => handleInputChange(index, 'referencia', e.target.value)}
-                                            className={`form-control ${errores[index] && errores[index].referencia ? 'is-invalid' : ''}`}
+                                            className="form-control"
                                         />
                                     </div>
                                 </div>
@@ -204,7 +170,7 @@ const GenLetras = ({ rucData }) => {
                                             id={`giro-${index}`}
                                             value={letra.giro}
                                             onChange={(e) => handleInputChange(index, 'giro', e.target.value)}
-                                            className={`form-control ${errores[index] && errores[index].giro ? 'is-invalid' : ''}`}
+                                            className="form-control"
                                         />
                                     </div>
                                 </div>
@@ -218,7 +184,7 @@ const GenLetras = ({ rucData }) => {
                                             id={`vencimiento-${index}`}
                                             value={letra.vencimiento}
                                             onChange={(e) => handleInputChange(index, 'vencimiento', e.target.value)}
-                                            className={`form-control ${errores[index] && errores[index].vencimiento ? 'is-invalid' : ''}`}
+                                            className="form-control"
                                         />
                                     </div>
                                 </div>
@@ -249,7 +215,7 @@ const GenLetras = ({ rucData }) => {
                                             placeholder={getPlaceholder(letra.moneda)}
                                             value={letra.importe}
                                             onChange={(e) => handleInputChange(index, 'importe', e.target.value.replace(/[^0-9.]/g, ''))}
-                                            className={`form-control ${errores[index] && errores[index].importe ? 'is-invalid' : ''}`}
+                                            className="form-control"
                                         />
                                     </div>
                                 </div>

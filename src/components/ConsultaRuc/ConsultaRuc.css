@@ -19,3 +19,24 @@
 .estado-circulo.inactivo {
     background-color: red;
 }
+
+/* Flexbox para colocar label e input en la misma fila y centrarlos verticalmente */
+.form-group {
+    display: flex;
+    align-items: first baseline; /* Alinea verticalmente en el centro */
+    margin-bottom: 15px;
+}
+
+label {
+    text-transform: uppercase; /* Convierte el texto en mayúsculas */
+    margin-right: 10px; /* Espacio a la derecha del label */
+    font-weight: bold;
+    text-align: left;
+    width: 150px; /* Ajusta el ancho del label */
+    display: flex; /* Necesario para que el label se comporte bien con flexbox */
+    align-items: center; /* Centra el texto dentro del label */
+}
+
+input {
+    flex: 1; /* Hace que el input ocupe el espacio restante */
+}
