@@ -15,15 +15,28 @@ const formatearImporte = (importe, moneda) => {
     return `${moneda === 'Soles' ? 'S/' : 'US$'} ${formattedImporte}`;
 };
 
-// Función para ajustar el tamaño de fuente según el espacio disponible
-const ajustarTamañoFuente = (doc, texto, maxAncho, tamañoFuenteInicial) => {
-    let tamañoFuente = tamañoFuenteInicial;
+// Función para dividir texto en múltiples líneas según el ancho máximo permitido
+const dividirTextoEnLineas = (doc, texto, maxAncho, tamañoFuente) => {
+    const palabras = texto.split(' ');
+    let lineaActual = '';
+    const lineas = [];
     doc.setFontSize(tamañoFuente);
-    while (doc.getTextWidth(texto) > maxAncho && tamañoFuente > 0) {
-        tamañoFuente -= 0.5;
-        doc.setFontSize(tamañoFuente);
+
+    palabras.forEach((palabra) => {
+        const nuevaLinea = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        if (doc.getTextWidth(nuevaLinea) <= maxAncho) {
+            lineaActual = nuevaLinea;
+        } else {
+            lineas.push(lineaActual);
+            lineaActual = palabra;
+        }
+    });
+
+    if (lineaActual) {
+        lineas.push(lineaActual);
     }
-    return tamañoFuente;
+
+    return lineas;
 };
 
 export const generarPDFs = (letras, rucData) => {
@@ -41,47 +54,58 @@ export const generarPDFs = (letras, rucData) => {
         // Configurar el tamaño de fuente
         doc.setFontSize(9);
 
-        // Ajustar tamaño de fuente para el campo razon_social
+        // Ajustar tamaño de fuente para el campo razón social
         const razonSocial = (rucData.razon_social || '').toUpperCase();
-        const tamañoFuenteRazonSocial = ajustarTamañoFuente(doc, razonSocial, 200, 9); // Espacio desde 250 a 450 es 200
-        doc.setFontSize(tamañoFuenteRazonSocial);
         doc.text(razonSocial, 250, 298);
 
-        // Ajustar tamaño de fuente para el campo direccion
+        // Ajustar tamaño de fuente y dividir el texto para el campo dirección
         const direccion = (rucData.direccion || '').toUpperCase();
-        const tamañoFuenteDireccion = ajustarTamañoFuente(doc, direccion, 200, 9); // Espacio desde 250 a 450 es 200
-        doc.setFontSize(tamañoFuenteDireccion);
-        doc.text(direccion, 248, 315);
+        const maxAnchoDireccion = 200; // Ancho máximo permitido
+        let tamañoFuenteDireccion = 9; // Tamaño inicial de la fuente
+        const lineasDireccion = dividirTextoEnLineas(doc, direccion, maxAnchoDireccion, tamañoFuenteDireccion);
+
+        // Reducir el tamaño de la fuente un 25% si hay dos líneas
+        if (lineasDireccion.length > 1) {
+            tamañoFuenteDireccion *= 0.75; // Reducir un 25%
+            doc.setFontSize(tamañoFuenteDireccion);
+        }
+
+        // Calcular la posición inicial para centrar las líneas
+        const yBaseDireccion = 315; // Posición inicial para una sola línea
+        const alturaLetra = tamañoFuenteDireccion * 1.5; // Altura entre líneas (ajustada según el tamaño de la fuente)
+        const yInicioDireccion = yBaseDireccion - (lineasDireccion.length > 1 ? (alturaLetra / 2) : 0);
+
+        // Dibujar las líneas de la dirección
+        lineasDireccion.slice(0, 2).forEach((linea, index) => {
+            const y = yInicioDireccion + index * alturaLetra;
+            doc.text(linea, 248, y);
+        });
 
         // Ajustar tamaño de fuente para el campo distrito
+        doc.setFontSize(9);
         const distrito = (rucData.distrito || '').toUpperCase();
-        const tamañoFuenteDistrito = ajustarTamañoFuente(doc, distrito, 118, 9); // Espacio desde 230 a 350 es 120
-        doc.setFontSize(tamañoFuenteDistrito);
         doc.text(distrito, 220, 330);
 
         // Ajustar tamaño de fuente para el campo departamento
         const departamento = (rucData.departamento || '').toUpperCase();
-        const tamañoFuenteDepartamento = ajustarTamañoFuente(doc, departamento, 100, 9); // Espacio de 100
-        doc.setFontSize(tamañoFuenteDepartamento);
         doc.text(departamento, 368, 330);
 
         // Restaurar tamaño de fuente para otros campos
-        doc.setFontSize(9);
-        doc.text(`${(rucData.ruc || '').toUpperCase()}`, 250, 348); // Coordenadas x, y ajustadas
-        doc.text(`${(rucData.telefono || '').toUpperCase()}`, 365, 348); // Coordenadas para el teléfono
+        doc.text(`${(rucData.ruc || '').toUpperCase()}`, 250, 348);
+        doc.text(`${(rucData.telefono || '').toUpperCase()}`, 365, 348);
 
         // Agregar datos de la letra en la primera hoja
-        doc.text(`${(letra.letra || '').toUpperCase()}`, 240, 230); // Ajusta según la plantilla
+        doc.text(`${(letra.letra || '').toUpperCase()}`, 240, 230);
         doc.text(`${(letra.referencia || '').toUpperCase()}`, 322, 230);
-        doc.text(formatearFecha(letra.giro).toUpperCase(), 392, 230); // Formato de fecha
-        doc.text(formatearFecha(letra.vencimiento).toUpperCase(), 562, 230); // Formato de fecha
-        doc.text(formatearImporte(letra.importe, letra.moneda).toUpperCase(), 650, 230); // Importe con moneda
+        doc.text(formatearFecha(letra.giro).toUpperCase(), 392, 230);
+        doc.text(formatearFecha(letra.vencimiento).toUpperCase(), 562, 230);
+        doc.text(formatearImporte(letra.importe, letra.moneda).toUpperCase(), 650, 230);
 
         // Agregar importe en texto
-        doc.text(numeroALetras(letra.importe, letra.moneda === 'Soles' ? 'SOLES' : 'DÓLARES').toUpperCase(), 240, 268); // Ajusta según la plantilla
+        doc.text(numeroALetras(letra.importe, letra.moneda === 'Soles' ? 'SOLES' : 'DÓLARES').toUpperCase(), 240, 268);
 
         // Agregar texto "LIMA"
-        doc.text('LIMA', 483, 230); // Ajusta las coordenadas según sea necesario
+        doc.text('LIMA', 483, 230);
 
         // Sumar el importe total
         totalImporte += parseFloat(letra.importe);
@@ -89,13 +113,13 @@ export const generarPDFs = (letras, rucData) => {
 
     // Agregar una nueva página para el resumen
     doc.addPage();
-    
+
     // Configurar el tamaño de fuente
     doc.setFontSize(12);
     doc.text('RESUMEN DE LETRAS EMITIDAS', 40, 40);
 
     // Configurar la tabla
-    const resumenData = letras.map((letra, index) => [
+    const resumenData = letras.map((letra) => [
         (letra.letra || '').toUpperCase(),
         (rucData.razon_social || '').toUpperCase(),
         (rucData.ruc || '').toUpperCase(),
