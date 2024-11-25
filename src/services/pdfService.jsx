@@ -15,30 +15,6 @@ const formatearImporte = (importe, moneda) => {
     return `${moneda === 'Soles' ? 'S/' : 'US$'} ${formattedImporte}`;
 };
 
-// Función para dividir texto en múltiples líneas según el ancho máximo permitido
-const dividirTextoEnLineas = (doc, texto, maxAncho, tamañoFuente) => {
-    const palabras = texto.split(' ');
-    let lineaActual = '';
-    const lineas = [];
-    doc.setFontSize(tamañoFuente);
-
-    palabras.forEach((palabra) => {
-        const nuevaLinea = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-        if (doc.getTextWidth(nuevaLinea) <= maxAncho) {
-            lineaActual = nuevaLinea;
-        } else {
-            lineas.push(lineaActual);
-            lineaActual = palabra;
-        }
-    });
-
-    if (lineaActual) {
-        lineas.push(lineaActual);
-    }
-
-    return lineas;
-};
-
 export const generarPDFs = (letras, rucData) => {
     const doc = new jsPDF('landscape', 'pt', 'a4', true);
     let totalImporte = 0;
@@ -58,31 +34,24 @@ export const generarPDFs = (letras, rucData) => {
         const razonSocial = (rucData.razon_social || '').toUpperCase();
         doc.text(razonSocial, 250, 298);
 
-        // Ajustar tamaño de fuente y dividir el texto para el campo dirección
+        // Ajustar tamaño de fuente para el campo dirección
         const direccion = (rucData.direccion || '').toUpperCase();
-        const maxAnchoDireccion = 200; // Ancho máximo permitido
         let tamañoFuenteDireccion = 9; // Tamaño inicial de la fuente
-        const lineasDireccion = dividirTextoEnLineas(doc, direccion, maxAnchoDireccion, tamañoFuenteDireccion);
+        const maxAnchoDireccion = doc.getTextWidth(razonSocial); // Usar el ancho del campo razón social como referencia
 
-        // Reducir el tamaño de la fuente un 25% si hay dos líneas
-        if (lineasDireccion.length > 1) {
-            tamañoFuenteDireccion *= 0.75; // Reducir un 25%
+        // Reducir el tamaño de la fuente si el texto no entra en el ancho máximo
+        while (doc.getTextWidth(direccion) > maxAnchoDireccion && tamañoFuenteDireccion > 6.75) { // Reducir hasta un 25%
+            tamañoFuenteDireccion -= 0.25;
             doc.setFontSize(tamañoFuenteDireccion);
         }
 
-        // Calcular la posición inicial para centrar las líneas
-        const yBaseDireccion = 315; // Posición inicial para una sola línea
-        const alturaLetra = tamañoFuenteDireccion * 1.5; // Altura entre líneas (ajustada según el tamaño de la fuente)
-        const yInicioDireccion = yBaseDireccion - (lineasDireccion.length > 1 ? (alturaLetra / 2) : 0);
+        // Dibujar la dirección en la posición correspondiente
+        doc.text(direccion, 250, 315);
 
-        // Dibujar las líneas de la dirección
-        lineasDireccion.slice(0, 2).forEach((linea, index) => {
-            const y = yInicioDireccion + index * alturaLetra;
-            doc.text(linea, 248, y);
-        });
+        // Restaurar tamaño de fuente para el resto de campos
+        doc.setFontSize(9);
 
         // Ajustar tamaño de fuente para el campo distrito
-        doc.setFontSize(9);
         const distrito = (rucData.distrito || '').toUpperCase();
         doc.text(distrito, 220, 330);
 
